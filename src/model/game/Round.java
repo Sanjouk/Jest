@@ -139,6 +139,10 @@ public class Round {
         }
 
     }
+
+    public static void setRoundCounter(int counter) {
+        roundCounter = counter;
+    }
 }
 
 

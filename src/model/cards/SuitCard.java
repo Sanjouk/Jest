@@ -1,8 +1,11 @@
 package model.cards;
 
-public class SuitCard extends Card {
+import java.io.Serializable;
+
+public class SuitCard extends Card implements Serializable {
     private Suit suit;
     private Face face;
+    private static final long serialVersionUID = 1L;
 
 
     public SuitCard(boolean isTrophy, Suit suit, Face face) {

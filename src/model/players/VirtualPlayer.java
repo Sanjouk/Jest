@@ -84,4 +84,11 @@ public class VirtualPlayer extends Player {
              return strategy.chooseCard(validOffers);
         }
     }
+
+    public StrategyType getStrategyType() {
+        if (strategy instanceof RandomStrategy) return StrategyType.RANDOM;
+        if (strategy instanceof AggressiveStrategy) return StrategyType.AGGRESSIVE;
+        if (strategy instanceof CautiousStrategy) return StrategyType.CAUTIOUS;
+        return StrategyType.RANDOM;
+    }
 }

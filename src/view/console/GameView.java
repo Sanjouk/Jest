@@ -171,7 +171,7 @@ public class GameView {
         if (winners == null || winners.isEmpty()) {
             System.out.println("There is no winner");
         } else if (winners.size() == 1) {
-            System.out.println("Winner is " + winners.getFirst().getName());
+            System.out.println("Winner is " + winners.get(0).getName());
         } else {
             System.out.print("It's a tie between: ");
             for (int i = 0; i < winners.size(); i++) {
@@ -188,4 +188,52 @@ public class GameView {
         System.out.println("Game ended successfully.");
         System.out.println("We can assign all trophies to get the winner");
     }
+
+    public String askSaveName() {
+        System.out.print("Enter a name for this save (or press Enter for auto-generated name): ");
+        return scanner.nextLine().trim();
+    }
+    public void showMessage(String message) {
+        System.out.println(message);
+    }
+
+    public boolean askToLoadRound() {
+        System.out.print("Would you like to load a saved round? (Y/N): ");
+        String response = scanner.nextLine().trim().toUpperCase();
+        return response.equals("Y") || response.equals("YES");
+    }
+
+    public String askSaveFileToLoad(List<String> saveFiles) {
+        if (saveFiles == null || saveFiles.isEmpty()) {
+            System.out.println("No saves found.");
+            return null;
+        }
+
+        System.out.println("Available saves:");
+        for (int i = 0; i < saveFiles.size(); i++) {
+            System.out.println((i + 1) + ". " + saveFiles.get(i));
+        }
+
+        while (true) {
+            System.out.print("Enter the number of the save to load (or press Enter to cancel): ");
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) return null;
+            try {
+                int index = Integer.parseInt(input) - 1;
+                if (index >= 0 && index < saveFiles.size()) {
+                    return saveFiles.get(index);
+                }
+                System.out.println("Invalid choice.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    public boolean askToSaveGame() {
+        System.out.print("Would you like to save the game? (Y/N): ");
+        String response = scanner.nextLine().trim().toUpperCase();
+        return response.equals("Y") || response.equals("YES");
+    }
+
 }

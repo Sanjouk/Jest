@@ -2,6 +2,7 @@ package controller;
 
 import model.cards.CardEffect;
 import model.cards.ExtensionCard; // Import nécessaire
+import model.game.GameSaveManager;
 import model.players.Player;
 import model.players.ScoreVisitorImpl;
 import model.players.strategies.StrategyType;
@@ -10,6 +11,7 @@ import view.console.GameView;
 import model.game.Game;
 import view.console.RoundView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List; // Import nécessaire
 
@@ -187,6 +189,10 @@ public class GameController {
 
             consoleView.showRound(roundController.getRoundCounter());
             roundController.playRound();
+
+            if (consoleView.askToSaveGame()) {
+                saveGame();
+            }
             // somehow add rounds to rounds in game
 //            rounds.add(currentRound);
 
@@ -215,5 +221,19 @@ public class GameController {
         ArrayList<Player> winners = model.getWinners();
         consoleView.showWinners(winners);
 
+    }
+
+    public void saveGame() {
+        try {
+            String saveName = consoleView.askSaveName();
+            String path = GameSaveManager.saveGame(model, Round.getRoundCounter(), saveName);
+            consoleView.showMessage("Game saved successfully to: " + path);
+        } catch (IOException e) {
+            consoleView.showMessage("Failed to save game: " + e.getMessage());
+        }
+    }
+
+    public static Game loadGame(String filename) throws IOException, ClassNotFoundException {
+        return GameSaveManager.loadGame(filename);
     }
 }

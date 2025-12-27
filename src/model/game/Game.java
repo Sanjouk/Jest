@@ -429,4 +429,13 @@ public class Game {
         }
         return sb.toString();
     }
+
+
+    public ArrayList<Card> getTrophies() {
+        return trophies;
+    }
+
+    public void setTrophies(ArrayList<Card> trophies) {
+        this.trophies = trophies;
+    }
 }

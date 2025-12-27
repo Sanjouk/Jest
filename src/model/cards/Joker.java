@@ -1,6 +1,10 @@
 package model.cards;
 
-public class Joker extends Card {
+import java.io.Serializable;
+
+public class Joker extends Card implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public Joker(boolean isTrophy) {
         super(isTrophy);
     }
