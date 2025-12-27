@@ -1,6 +1,7 @@
 package controller;
 
-import view.console.RoundView;
+import view.interfaces.IRoundView;
+import view.ViewFactory;
 import model.players.Offer;
 import model.players.Player;
 import model.game.Round;
@@ -11,19 +12,22 @@ import java.util.Map;
 
 public class RoundController {
     private Round model;
-    private RoundView view;
+    private IRoundView view;
     private final Map<Player, PlayerController> playerControllers;
+    private final ViewFactory viewFactory;
 
-    public RoundController(Round model, RoundView view) {
+    public RoundController(Round model, IRoundView view, ViewFactory viewFactory) {
         this.model = model;
         this.view = view;
+        this.viewFactory = viewFactory;
         this.playerControllers = new HashMap<>();
         initializePlayerControllers();
     }
 
     public void initializePlayerControllers() {
         for (Player player: model.getPlayers()){
-            PlayerController controller = PlayerController.createController(player);
+            view.interfaces.IPlayerView playerView = viewFactory.createPlayerView(player);
+            PlayerController controller = PlayerController.createController(player, playerView);
             this.playerControllers.put(player, controller);
         }
     }

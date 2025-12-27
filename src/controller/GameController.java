@@ -3,36 +3,41 @@ package controller;
 import model.players.Player;
 import model.players.strategies.StrategyType;
 import model.game.Round;
-import view.console.GameView;
+import view.interfaces.IGameView;
 import model.game.Game;
-import view.console.RoundView;
+import view.interfaces.IRoundView;
+import view.ViewFactory;
 
 import java.util.ArrayList;
 
 public class GameController {
     private final Game model;
-    private final GameView consoleView;
+    private final IGameView gameView;
+    private final IRoundView roundView;
+    private final ViewFactory viewFactory;
 
-    public GameController(Game model, GameView consoleView) {
+    public GameController(Game model, IGameView gameView, IRoundView roundView, ViewFactory viewFactory) {
         this.model = model;
-        this.consoleView = consoleView;
+        this.gameView = gameView;
+        this.roundView = roundView;
+        this.viewFactory = viewFactory;
     }
 //    private final GameView guiView;
 
     public void addPlayers(){
-        int playerCount = consoleView.askNumberOfPlayers();
+        int playerCount = gameView.askNumberOfPlayers();
         for (int i = 1; i <= playerCount; i++) {
-            String name = consoleView.askPlayerName(i);
-            boolean isHuman = consoleView.isHumanPlayer(name);
+            String name = gameView.askPlayerName(i);
+            boolean isHuman = gameView.isHumanPlayer(name);
             if  (isHuman) {
                 model.addHumanPlayer(name);
             }
             else {
-                StrategyType strategy = consoleView.askStrategy(name);
+                StrategyType strategy = gameView.askStrategy(name);
                 model.addVirtualPlayer(name, strategy);
             }
         }
-        consoleView.showPlayers(model.getPlayers());
+        gameView.showPlayers(model.getPlayers());
     }
 
     public void startGame(){
@@ -41,7 +46,7 @@ public class GameController {
             throw new IllegalStateException("Jest supports 3 or 4 players only.");
         }
         model.chooseTrophies(model.getPlayers().size());
-        consoleView.showTrophies(model.trophiesInfo());
+        gameView.showTrophies(model.trophiesInfo());
 
         playGame();
 
@@ -50,9 +55,9 @@ public class GameController {
 
     public void playGame() {
         while (!model.getDeck().isEmpty()) {
-            RoundController roundController = new RoundController(new Round(model.getPlayers(), model.getDeck()), new RoundView());
+            RoundController roundController = new RoundController(new Round(model.getPlayers(), model.getDeck()), roundView, viewFactory);
 
-            consoleView.showRound(roundController.getRoundCounter());
+            gameView.showRound(roundController.getRoundCounter());
             roundController.playRound();
             // somehow add rounds to rounds in game
 //            rounds.add(currentRound);
@@ -69,18 +74,18 @@ public class GameController {
             player.takeRemainingOfferCard();
         }
 
-        consoleView.showEndRoundMessage();
+        gameView.showEndRoundMessage();
         model.assignTrophies();
         model.calculateAllScores();
 
         for (Player player : model.getPlayers()) {
-            consoleView.showScore(player);
+            gameView.showScore(player);
         }
 
 //        Player winner = getWinner();
 //        view.showWinner(winner);
         ArrayList<Player> winners = model.getWinners();
-        consoleView.showWinners(winners);
+        gameView.showWinners(winners);
 
     }
 }

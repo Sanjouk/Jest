@@ -2,12 +2,13 @@ package view.console;
 
 import model.players.Player;
 import model.players.strategies.StrategyType;
+import view.interfaces.IGameView;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class GameView {
+public class GameView implements IGameView {
 
     private final Scanner scanner;
 
