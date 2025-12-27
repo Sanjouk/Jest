@@ -144,7 +144,7 @@ public class Game {
     }
 
     private Player evaluateLowestFace(Suit suit) {
-        // 4 because it's max in faceValues in Faces enum
+        // 4 because it's max in faceValues in Face enum
         int lowestFaceValue = 4;
         ArrayList<Player> ties = new ArrayList<>();
         for (Player player : players) {
@@ -171,7 +171,7 @@ public class Game {
         return ties.getFirst();
     }
 
-    private Player evaluateMajorityFaceValue(Faces face) {
+    private Player evaluateMajorityFaceValue(Face face) {
         int cardsCount = 0;
         int maxCardsCount = -1;
         ArrayList<Player> ties = new ArrayList<>();
@@ -290,7 +290,7 @@ public class Game {
         return best;
     }
 
-    private Player breakTieByStrongestSuitAmongFaceValue(ArrayList<Player> ties,  Faces face) {
+    private Player breakTieByStrongestSuitAmongFaceValue(ArrayList<Player> ties,  Face face) {
         Player best = null;
         int bestStrength = -1;
         for (Player player : ties) {
@@ -330,8 +330,8 @@ public class Game {
                 }
                 // Червы
                 else if (((SuitCard) trophy).getSuit() == Suit.CLUBS) {
-                    if (((SuitCard) trophy).getFaces() != Faces.TWO && ((SuitCard) trophy).getFaces() != Faces.THREE) {
-                        if (((SuitCard) trophy).getFaces() == Faces.FOUR) {
+                    if (((SuitCard) trophy).getFace() != Face.TWO && ((SuitCard) trophy).getFace() != Face.THREE) {
+                        if (((SuitCard) trophy).getFace() == Face.FOUR) {
                             TrophyType type = TrophyType.LOWEST_FACE;
                             trophy.setTrophySuit(Suit.SPADES);
 //                            type.setSuit(Suit.SPADES);
@@ -343,7 +343,7 @@ public class Game {
                             trophy.setTrophyType(type);
                         }
                     } else {
-                        if (((SuitCard) trophy).getFaces() == Faces.THREE) {
+                        if (((SuitCard) trophy).getFace() == Face.THREE) {
                             TrophyType type = TrophyType.HIGHEST_FACE;
                             trophy.setTrophySuit(Suit.HEARTS);
 //                            type.setSuit(Suit.HEARTS);
@@ -357,8 +357,8 @@ public class Game {
                     }
                     // Пики
                 } else if (((SuitCard) trophy).getSuit() == Suit.SPADES) {
-                    if (((SuitCard) trophy).getFaces() != Faces.THREE && ((SuitCard) trophy).getFaces() != Faces.TWO) {
-                        if (((SuitCard) trophy).getFaces() == Faces.FOUR) {
+                    if (((SuitCard) trophy).getFace() != Face.THREE && ((SuitCard) trophy).getFace() != Face.TWO) {
+                        if (((SuitCard) trophy).getFace() == Face.FOUR) {
                             TrophyType type = TrophyType.LOWEST_FACE;
                             trophy.setTrophySuit(Suit.CLUBS);
 //                            type.setSuit(Suit.CLUBS);
@@ -370,30 +370,30 @@ public class Game {
                             trophy.setTrophyType(type);
                         }
                     } else {
-                        if (((SuitCard) trophy).getFaces() == Faces.THREE) {
+                        if (((SuitCard) trophy).getFace() == Face.THREE) {
                             TrophyType type = TrophyType.MAJORITY_FACE_VALUE;
-                            trophy.setTrophyFace(Faces.TWO);
-//                            type.setFace(Faces.TWO);
+                            trophy.setTrophyFace(Face.TWO);
+//                            type.setFace(Face.TWO);
                             trophy.setTrophyType(type);
                         } else {
                             TrophyType type = TrophyType.MAJORITY_FACE_VALUE;
-                            trophy.setTrophyFace(Faces.THREE);
-//                            type.setFace(Faces.THREE);
+                            trophy.setTrophyFace(Face.THREE);
+//                            type.setFace(Face.THREE);
                             trophy.setTrophyType(type);
                         }
                     }
                 }
                 // Бубна
                 else {
-                    if (((SuitCard) trophy).getFaces() == Faces.FOUR) {
+                    if (((SuitCard) trophy).getFace() == Face.FOUR) {
                         trophy.setTrophyType(TrophyType.BEST_JEST_NO_JOKER);
-                    } else if (((SuitCard) trophy).getFaces() == Faces.ACE) {
+                    } else if (((SuitCard) trophy).getFace() == Face.ACE) {
                         TrophyType type = TrophyType.MAJORITY_FACE_VALUE;
-                        trophy.setTrophyFace(Faces.FOUR);
-//                        type.setFace(Faces.FOUR);
+                        trophy.setTrophyFace(Face.FOUR);
+//                        type.setFace(Face.FOUR);
                         trophy.setTrophyType(type);
                     } else {
-                        if (((SuitCard) trophy).getFaces() == Faces.TWO) {
+                        if (((SuitCard) trophy).getFace() == Face.TWO) {
                             TrophyType type = TrophyType.HIGHEST_FACE;
                             trophy.setTrophySuit(Suit.DIAMONDS);
 //                            type.setSuit(Suit.DIAMONDS);

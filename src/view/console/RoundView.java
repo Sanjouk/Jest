@@ -3,9 +3,8 @@ package view.console;
 import model.cards.Card;
 import model.players.Offer;
 import model.players.Player;
-import view.interfaces.IRoundView;
 
-public class RoundView implements IRoundView {
+public class RoundView {
 
     public void showRoundStart() {
         System.out.println("Round Started");

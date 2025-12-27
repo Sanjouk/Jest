@@ -1,6 +1,6 @@
 package view.console;
 
-import view.interfaces.IPlayerView;
-
-public abstract class PlayerView implements IPlayerView {
+public abstract class PlayerView {
+    public abstract void showMessage(String message);
+    public abstract void hasNoEnoughCards(String name);
 }

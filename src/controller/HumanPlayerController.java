@@ -1,6 +1,7 @@
 package controller;
 
-import view.interfaces.IHumanView;
+import view.console.PlayerView;
+import view.console.HumanView;
 import model.players.Player;
 import model.players.HumanPlayer;
 import model.players.Offer;
@@ -10,16 +11,14 @@ import java.util.ArrayList;
 
 
 public class HumanPlayerController extends PlayerController {
-    private final IHumanView humanView;
-    
-    public HumanPlayerController(Player player, IHumanView view) {
+    public HumanPlayerController(Player player, PlayerView view) {
         super(player, view);
-        this.humanView = view;
     }
 
     @Override
     public Offer makeOffer() {
         HumanPlayer humanPlayer = (HumanPlayer) player;
+        HumanView humanView = (HumanView) view;
 
         if (humanPlayer.getHand().size() < 2) {
             humanView.hasNoEnoughCards(humanPlayer.getName());
@@ -47,6 +46,7 @@ public class HumanPlayerController extends PlayerController {
     @Override
     public Offer chooseCard(ArrayList<Offer> availableOffers) {
         HumanPlayer humanPlayer = (HumanPlayer) player;
+        HumanView humanView = (HumanView) view;
 
         humanView.showMessage(humanPlayer.getName() + ", please choose a card from players' offers!");
 

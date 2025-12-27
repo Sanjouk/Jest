@@ -4,17 +4,18 @@ package controller;
 import model.players.HumanPlayer;
 import model.players.Player;
 import model.players.VirtualPlayer;
-import view.interfaces.IPlayerView;
-import view.interfaces.IHumanView;
+import view.console.HumanView;
+import view.console.PlayerView;
 import model.players.Offer;
+import view.console.VirtualView;
 
 import java.util.ArrayList;
 
 public abstract class PlayerController {
     protected final Player player;
-    protected final IPlayerView view;
+    protected final PlayerView view;
 
-    protected PlayerController(Player player, IPlayerView view) {
+    protected PlayerController(Player player, PlayerView view) {
         this.player = player;
         this.view = view;
     }
@@ -22,15 +23,12 @@ public abstract class PlayerController {
     public abstract Offer makeOffer();
     public abstract Offer chooseCard(ArrayList<Offer> availableOffers);
 
-    public static PlayerController createController(Player player, IPlayerView view) {
+    public static PlayerController createController(Player player) {
         if (player instanceof HumanPlayer) {
-            if (!(view instanceof IHumanView)) {
-                throw new IllegalArgumentException("HumanPlayer requires IHumanView");
-            }
-            return new HumanPlayerController(player, (IHumanView) view);
+            return new HumanPlayerController(player, new HumanView());
         }
         if (player instanceof VirtualPlayer){
-            return new VirtualPlayerController(player, view);
+            return new VirtualPlayerController(player, new VirtualView());
         }
         throw new IllegalArgumentException("Unknown player type");
     }
