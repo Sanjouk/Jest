@@ -1,6 +1,7 @@
 package view.gui;
 
 import model.cards.Card;
+import model.cards.ExtensionCard;
 import model.cards.Joker;
 import model.cards.Suit;
 import model.cards.SuitCard;
@@ -71,6 +72,86 @@ public class CardComponent extends JPanel {
             drawJoker(g);
         } else if (card instanceof SuitCard) {
             drawSuitCard(g, (SuitCard) card);
+        } else if (card instanceof ExtensionCard) {
+            drawExtensionCard(g, (ExtensionCard) card);
+        }
+    }
+
+    private void drawExtensionCard(Graphics2D g, ExtensionCard extCard) {
+        // Subtle background to distinguish extension cards
+        g.setColor(new Color(245, 245, 255));
+        g.fillRoundRect(3, 3, getWidth() - 6, getHeight() - 6, 10, 10);
+
+        // Header band
+        g.setColor(new Color(70, 70, 160));
+        g.fillRoundRect(6, 6, getWidth() - 12, 26, 8, 8);
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        String title = extCard.getName();
+        FontMetrics fmTitle = g.getFontMetrics();
+        int titleMaxWidth = getWidth() - 16;
+        if (fmTitle.stringWidth(title) > titleMaxWidth) {
+            while (title.length() > 0 && fmTitle.stringWidth(title + "…") > titleMaxWidth) {
+                title = title.substring(0, title.length() - 1);
+            }
+            title = title + "…";
+        }
+        g.drawString(title, 10, 24);
+
+        // Value badge (top-right)
+        int badgeW = 26;
+        int badgeH = 18;
+        int badgeX = getWidth() - badgeW - 8;
+        int badgeY = 38;
+        g.setColor(new Color(255, 215, 0));
+        g.fillRoundRect(badgeX, badgeY, badgeW, badgeH, 8, 8);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        String val = String.valueOf(extCard.getFaceValue());
+        FontMetrics fmVal = g.getFontMetrics();
+        g.drawString(val, badgeX + (badgeW - fmVal.stringWidth(val)) / 2, badgeY + 13);
+
+        // Label
+        g.setColor(new Color(70, 70, 160));
+        g.setFont(new Font("Arial", Font.BOLD, 10));
+        g.drawString("EXT", 10, 52);
+
+        // Description (wrapped to a few lines)
+        g.setColor(Color.DARK_GRAY);
+        g.setFont(new Font("Arial", Font.PLAIN, 10));
+        String desc = extCard.getDescription();
+        if (desc == null) desc = "";
+
+        int x = 10;
+        int y = 68;
+        int maxWidth = getWidth() - 20;
+        int lineHeight = 12;
+        int maxLines = 5;
+
+        String[] words = desc.split("\\s+");
+        StringBuilder line = new StringBuilder();
+        int lines = 0;
+        for (String w : words) {
+            if (w.isEmpty()) continue;
+            String candidate = line.isEmpty() ? w : line + " " + w;
+            if (g.getFontMetrics().stringWidth(candidate) <= maxWidth) {
+                line.setLength(0);
+                line.append(candidate);
+            } else {
+                g.drawString(line.toString(), x, y);
+                y += lineHeight;
+                lines++;
+                if (lines >= maxLines) {
+                    g.drawString("…", x, y);
+                    return;
+                }
+                line.setLength(0);
+                line.append(w);
+            }
+        }
+        if (!line.isEmpty() && lines < maxLines) {
+            g.drawString(line.toString(), x, y);
         }
     }
 
