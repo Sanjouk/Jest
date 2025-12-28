@@ -184,8 +184,13 @@ public class CardComponent extends JPanel {
 
         // Draw face value in bottom-right (rotated)
         g.setFont(new Font("Arial", Font.BOLD, 20));
+//        g.rotate(Math.PI, centerX, centerY);
+//        g.drawString(face, 8, -getHeight() + 25);
+//        g.rotate(-Math.PI, centerX, centerY);
+
+
         g.rotate(Math.PI, centerX, centerY);
-        g.drawString(face, 8, -getHeight() + 25);
+        g.drawString(face, -getWidth() + 20, -10);
         g.rotate(-Math.PI, centerX, centerY);
     }
 
@@ -211,6 +216,12 @@ public class CardComponent extends JPanel {
 
         // Start with a large font size
         Font baseFont = new Font("Segoe UI Emoji", Font.PLAIN, 1000);
+
+        // We can have a problem here with Joker, for diff systems we would need to provide fix
+        // MacOS works great, need tests on windows
+//        if (!baseFont.canDisplay('\uD83C\uDCCF')) {
+//            baseFont = new Font("Noto Color Emoji", Font.PLAIN, 1000);
+//        }
         FontRenderContext frc = g.getFontRenderContext();
         Rectangle2D bounds = baseFont.getStringBounds(jokerSymbol, frc);
 
