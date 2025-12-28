@@ -191,4 +191,21 @@ public class GameView implements IGameView {
         System.out.println("We can assign all trophies to get the winner");
     }
 
+    @Override
+    public boolean askSaveAfterRound() {
+        while (true) {
+            System.out.print("Save game now? (Y/N): ");
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.equals("Y")) return true;
+            if (input.equals("N")) return false;
+            System.out.println("Please enter 'Y' or 'N'.");
+        }
+    }
+
+    @Override
+    public String askSaveName() {
+        System.out.print("Enter save name (optional, press Enter for timestamp): ");
+        return scanner.nextLine();
+    }
+
 }

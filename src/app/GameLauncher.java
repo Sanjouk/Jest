@@ -13,6 +13,9 @@ import view.hybrid.RoundViewHybrid;
 import view.interfaces.IGameView;
 import view.interfaces.IRoundView;
 
+ import java.util.List;
+ import java.util.Scanner;
+
 import javax.swing.*;
 
 public class GameLauncher {
@@ -28,7 +31,6 @@ public class GameLauncher {
             System.out.println("Starting in " + mode + " mode...");
         }
 
-        Game model = new Game();
         IGameView gameView;
         IRoundView roundView;
         ViewFactory viewFactory;
@@ -74,8 +76,100 @@ public class GameLauncher {
                 viewFactory = new ViewFactory(ViewFactory.ViewMode.CONSOLE);
         }
 
+        Game model = selectNewOrLoadGame(mode, gameWindow);
+
         GameController controller = new GameController(model, gameView, roundView, viewFactory);
         controller.startGame();
+    }
+
+    private static Game selectNewOrLoadGame(GameMode mode, GameWindow gameWindow) {
+        if (mode == GameMode.GUI) {
+            String[] options = {"New Game", "Load Game"};
+            int choice = JOptionPane.showOptionDialog(
+                    gameWindow != null ? gameWindow.getFrame() : null,
+                    "Start a new game or load a saved game?",
+                    "Jest Card Game",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+            if (choice == 1) {
+                return loadGameGui(gameWindow);
+            }
+            return new Game();
+        }
+
+        // CONSOLE or HYBRID: keep it simple and use console prompts
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("1. Start new game");
+        System.out.println("2. Load saved game");
+        System.out.print("Enter choice (1-2): ");
+
+        int choice;
+        try {
+            choice = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            choice = 1;
+        }
+
+        if (choice != 2) {
+            return new Game();
+        }
+
+        List<String> saves = SaveManager.listSaves();
+        if (saves.isEmpty()) {
+            System.out.println("No saves found in /saves. Starting a new game.");
+            return new Game();
+        }
+
+        System.out.println("Available saves:");
+        for (int i = 0; i < saves.size(); i++) {
+            System.out.println((i + 1) + ". " + saves.get(i));
+        }
+        System.out.print("Select save (1-" + saves.size() + "): ");
+
+        int idx;
+        try {
+            idx = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            idx = 1;
+        }
+        if (idx < 1 || idx > saves.size()) {
+            System.out.println("Invalid choice. Starting a new game.");
+            return new Game();
+        }
+
+        return SaveManager.load(saves.get(idx - 1));
+    }
+
+    private static Game loadGameGui(GameWindow gameWindow) {
+        List<String> saves = SaveManager.listSaves();
+        if (saves.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    gameWindow != null ? gameWindow.getFrame() : null,
+                    "No saves found in /saves. Starting a new game.",
+                    "Load Game",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            return new Game();
+        }
+
+        String selected = (String) JOptionPane.showInputDialog(
+                gameWindow != null ? gameWindow.getFrame() : null,
+                "Select a save to load:",
+                "Load Game",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                saves.toArray(new String[0]),
+                saves.getFirst()
+        );
+
+        if (selected == null || selected.trim().isEmpty()) {
+            return new Game();
+        }
+        return SaveManager.load(selected);
     }
 
     private static GameMode selectMode() {

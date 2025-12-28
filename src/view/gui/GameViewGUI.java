@@ -218,5 +218,17 @@ public class GameViewGUI implements IGameView {
         appendOutput("Invalid extension configuration: " + message);
     }
 
+    @Override
+    public boolean askSaveAfterRound() {
+        String[] options = {"Save", "Don't Save"};
+        int choice = showOptionDialog("Save game now?", "Save", options);
+        return choice == 0;
+    }
+
+    @Override
+    public String askSaveName() {
+        return showInputDialog("Enter save name (optional, blank for timestamp):", "Save Name");
+    }
+
 }
 

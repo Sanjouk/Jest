@@ -98,4 +98,14 @@ public class GameViewHybrid implements IGameView {
         consoleView.showEndRoundMessage();
         guiView.showEndRoundMessage();
     }
+
+    @Override
+    public boolean askSaveAfterRound() {
+        return consoleView.askSaveAfterRound();
+    }
+
+    @Override
+    public String askSaveName() {
+        return consoleView.askSaveName();
+    }
 }

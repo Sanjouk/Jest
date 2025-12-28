@@ -22,5 +22,8 @@ public interface IGameView {
     ArrayList<Integer> askForExtensions(ArrayList<ExtensionCard> availableExtensions);
     void showInvalidExtensionMessage(String message);
 
+    boolean askSaveAfterRound();
+    String askSaveName();
+
 }
 

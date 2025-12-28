@@ -1,5 +1,6 @@
 package controller;
 
+import app.SaveManager;
 import model.cards.ExtensionCard;
 import model.game.ExtensionManager;
 import model.players.Player;
@@ -41,18 +42,20 @@ public class GameController {
     }
 
     public void startGame(){
-        addPlayers();
+        if (model.getPlayers() == null || model.getPlayers().isEmpty()) {
+            addPlayers();
 
-        // Validation: Jest supports 3 or 4 players only
-        if (model.getPlayers().size() < 3 || model.getPlayers().size() > 4) {
-            throw new IllegalStateException("Jest supports 3 or 4 players only.");
+            // Validation: Jest supports 3 or 4 players only
+            if (model.getPlayers().size() < 3 || model.getPlayers().size() > 4) {
+                throw new IllegalStateException("Jest supports 3 or 4 players only.");
+            }
+
+            // Handle extensions before choosing trophies
+            handleExtensions();
+
+            model.chooseTrophies(model.getPlayers().size());
+            gameView.showTrophies(model.trophiesInfo());
         }
-
-        // Handle extensions before choosing trophies
-        handleExtensions();
-
-        model.chooseTrophies(model.getPlayers().size());
-        gameView.showTrophies(model.trophiesInfo());
 
         playGame();
     }
@@ -108,6 +111,11 @@ public class GameController {
 
             gameView.showRound(roundController.getRoundCounter());
             roundController.playRound();
+
+            if (!model.getDeck().isEmpty() && gameView.askSaveAfterRound()) {
+                String saveName = gameView.askSaveName();
+                SaveManager.save(model, saveName);
+            }
 
             if (model.getDeck().isEmpty())
                 break;

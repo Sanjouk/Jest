@@ -8,13 +8,17 @@ import model.players.ScoreVisitorImpl;
 import model.players.VirtualPlayer;
 import model.players.strategies.StrategyType;
 
+ import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Game {
+public class Game implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final Deck deck;
     private final ArrayList<Player> players;
 // saving rounds has no logic here because they reference the same object each time so we capture not info this way
     private final ArrayList<Round> rounds;
+
+    private int savedRoundCounter;
 
     // test that Game knows about cards
     private ArrayList<Card> trophies;
@@ -25,6 +29,15 @@ public class Game {
         this.players = new ArrayList<>();
         this.rounds = new ArrayList<>();
         this.trophies = new ArrayList<>();
+        this.savedRoundCounter = 0;
+    }
+
+    public int getSavedRoundCounter() {
+        return savedRoundCounter;
+    }
+
+    public void setSavedRoundCounter(int savedRoundCounter) {
+        this.savedRoundCounter = savedRoundCounter;
     }
 
     // add players
