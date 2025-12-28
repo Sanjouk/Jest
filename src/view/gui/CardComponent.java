@@ -8,6 +8,9 @@ import model.cards.SuitCard;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 public class CardComponent extends JPanel {
     private final Card card;
@@ -187,26 +190,47 @@ public class CardComponent extends JPanel {
     }
 
     private void drawJoker(Graphics2D g) {
+        int cardWidth = getWidth();
+        int cardHeight = getHeight();
+
+        // Enable better text rendering
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Draw "JOKER" label at top
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 18));
-        
+        g.setFont(new Font("Arial", Font.BOLD, cardHeight / 10));
+
         FontMetrics fm = g.getFontMetrics();
         String text = "JOKER";
         int textWidth = fm.stringWidth(text);
-        int textHeight = fm.getAscent();
-        
-        int centerX = getWidth() / 2;
-        int centerY = getHeight() / 2;
-        
-        g.drawString(text, centerX - textWidth / 2, centerY - textHeight / 2);
-        
-        // Draw joker symbol
-        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.drawString(text, (cardWidth - textWidth) / 2, fm.getAscent() + 10);
+
+        // Joker symbol
         String jokerSymbol = "🃏";
-        fm = g.getFontMetrics();
-        textWidth = fm.stringWidth(jokerSymbol);
-        g.drawString(jokerSymbol, centerX - textWidth / 2, centerY + 20);
+
+        // Start with a large font size
+        Font baseFont = new Font("Segoe UI Emoji", Font.PLAIN, 1000);
+        FontRenderContext frc = g.getFontRenderContext();
+        Rectangle2D bounds = baseFont.getStringBounds(jokerSymbol, frc);
+
+        // Calculate scale to fit card
+        double scaleX = (cardWidth * 0.8) / bounds.getWidth();
+        double scaleY = (cardHeight * 0.8) / bounds.getHeight();
+        double scale = Math.min(scaleX, scaleY);
+
+        Font scaledFont = baseFont.deriveFont(AffineTransform.getScaleInstance(scale, scale));
+        g.setFont(scaledFont);
+
+        // Recalculate bounds after scaling
+        bounds = scaledFont.getStringBounds(jokerSymbol, frc);
+
+        int x = (int) ((cardWidth - bounds.getWidth()) / 2);
+        int y = (int) ((cardHeight - bounds.getHeight()) / 2 - bounds.getY());
+
+        g.drawString(jokerSymbol, x, y);
     }
+
 
     private void drawFaceDownCard(Graphics2D g) {
         // Draw card back
