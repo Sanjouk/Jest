@@ -7,6 +7,8 @@ import view.interfaces.IGameView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,8 @@ public class GameViewGUI implements IGameView {
     private final JPanel cardPanel;
     private String inputResult;
     private boolean waitingForInput;
+
+    private volatile JDialog activeDialog;
 
     public GameViewGUI(JFrame mainFrame, JTextArea outputArea, JPanel cardPanel) {
         this.mainFrame = mainFrame;
@@ -31,21 +35,89 @@ public class GameViewGUI implements IGameView {
         });
     }
 
+    public void cancelActiveDialog() {
+        JDialog dialog = activeDialog;
+        if (dialog == null) {
+            return;
+        }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                dialog.setVisible(false);
+                dialog.dispose();
+            } finally {
+                if (activeDialog == dialog) {
+                    activeDialog = null;
+                }
+            }
+        });
+    }
+
     private String showInputDialog(String message, String title) {
-        return JOptionPane.showInputDialog(mainFrame, message, title, JOptionPane.QUESTION_MESSAGE);
+        JOptionPane pane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+        pane.setWantsInput(true);
+
+        JDialog dialog = pane.createDialog(mainFrame, title);
+        activeDialog = dialog;
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (activeDialog == dialog) {
+                    activeDialog = null;
+                }
+            }
+        });
+
+        dialog.setVisible(true);
+
+        Object input = pane.getInputValue();
+        if (input == null || input == JOptionPane.UNINITIALIZED_VALUE) {
+            return null;
+        }
+        if (activeDialog == dialog) {
+            activeDialog = null;
+        }
+        return input.toString();
     }
 
     private int showOptionDialog(String message, String title, String[] options) {
-        return JOptionPane.showOptionDialog(
-            mainFrame,
-            message,
-            title,
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            options,
-            options[0]
+        JOptionPane pane = new JOptionPane(
+                message,
+                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION,
+                null,
+                options,
+                options.length > 0 ? options[0] : null
         );
+
+        JDialog dialog = pane.createDialog(mainFrame, title);
+        activeDialog = dialog;
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (activeDialog == dialog) {
+                    activeDialog = null;
+                }
+            }
+        });
+
+        dialog.setVisible(true);
+
+        Object selected = pane.getValue();
+        if (activeDialog == dialog) {
+            activeDialog = null;
+        }
+        if (selected == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(selected)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -183,13 +255,37 @@ public class GameViewGUI implements IGameView {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.setPreferredSize(new Dimension(640, 220));
 
-        int result = JOptionPane.showConfirmDialog(
-                mainFrame,
+        JOptionPane pane = new JOptionPane(
                 scrollPane,
-                "Select Extra Cards",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.OK_CANCEL_OPTION
         );
+
+        JDialog dialog = pane.createDialog(mainFrame, "Select Extra Cards");
+        activeDialog = dialog;
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (activeDialog == dialog) {
+                    activeDialog = null;
+                }
+            }
+        });
+
+        dialog.setVisible(true);
+
+        Object paneValue = pane.getValue();
+        if (activeDialog == dialog) {
+            activeDialog = null;
+        }
+
+        int result;
+        if (paneValue instanceof Integer) {
+            result = (Integer) paneValue;
+        } else {
+            result = JOptionPane.CANCEL_OPTION;
+        }
 
         ArrayList<Integer> selected = new ArrayList<>();
         if (result != JOptionPane.OK_OPTION) {

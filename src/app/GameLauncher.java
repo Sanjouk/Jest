@@ -15,6 +15,9 @@ import view.interfaces.IRoundView;
 
  import java.util.List;
  import java.util.Scanner;
+ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
 
 import javax.swing.*;
 
@@ -96,6 +99,141 @@ public class GameLauncher {
                     options[0]
             );
             if (choice == 1) {
+                return loadGameGui(gameWindow);
+            }
+            return new Game();
+        }
+
+        if (mode == GameMode.HYBRID) {
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+            final class Choice<T> {
+                private final Object lock = new Object();
+                private boolean resolved;
+                private T value;
+
+                boolean isResolved() {
+                    synchronized (lock) {
+                        return resolved;
+                    }
+                }
+
+                void resolve(T value) {
+                    synchronized (lock) {
+                        if (resolved) {
+                            return;
+                        }
+                        resolved = true;
+                        this.value = value;
+                        lock.notifyAll();
+                    }
+                }
+
+                T await() {
+                    synchronized (lock) {
+                        while (!resolved) {
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                return value;
+                            }
+                        }
+                        return value;
+                    }
+                }
+            }
+
+            Choice<Integer> startChoice = new Choice<>();
+
+            final class DialogRef {
+                private volatile JDialog dialog;
+            }
+            DialogRef guiDialogRef = new DialogRef();
+
+            Thread guiThread = new Thread(() -> {
+                String[] options = {"New Game", "Load Game"};
+                JOptionPane pane = new JOptionPane(
+                        "Start a new game or load a saved game?",
+                        JOptionPane.QUESTION_MESSAGE,
+                        JOptionPane.DEFAULT_OPTION,
+                        null,
+                        options,
+                        options[0]
+                );
+
+                JDialog dialog = pane.createDialog(gameWindow != null ? gameWindow.getFrame() : null, "Jest Card Game");
+                guiDialogRef.dialog = dialog;
+                dialog.setVisible(true);
+
+                Object selected = pane.getValue();
+                guiDialogRef.dialog = null;
+                if (selected == null) {
+                    startChoice.resolve(0);
+                    return;
+                }
+                for (int i = 0; i < options.length; i++) {
+                    if (options[i].equals(selected)) {
+                        startChoice.resolve(i);
+                        return;
+                    }
+                }
+                startChoice.resolve(0);
+            }, "Hybrid-GUI-SelectNewOrLoad");
+            guiThread.setDaemon(true);
+            guiThread.start();
+
+            Thread consoleThread = new Thread(() -> {
+                System.out.println("1. Start new game");
+                System.out.println("2. Load saved game");
+
+                while (!startChoice.isResolved()) {
+                    try {
+                        if (reader.ready()) {
+                            System.out.print("Enter choice (1-2): ");
+                            String line = reader.readLine();
+                            int choice;
+                            try {
+                                choice = Integer.parseInt(line.trim());
+                            } catch (NumberFormatException e) {
+                                choice = 1;
+                            }
+                            startChoice.resolve(choice == 2 ? 1 : 0);
+                            JDialog d = guiDialogRef.dialog;
+                            if (d != null) {
+                                SwingUtilities.invokeLater(() -> {
+                                    d.setVisible(false);
+                                    d.dispose();
+                                });
+                                guiDialogRef.dialog = null;
+                            }
+                            return;
+                        }
+                    } catch (IOException e) {
+                        startChoice.resolve(0);
+                        return;
+                    }
+
+                    synchronized (startChoice.lock) {
+                        if (startChoice.isResolved()) {
+                            return;
+                        }
+                        try {
+                            startChoice.lock.wait(75);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            startChoice.resolve(0);
+                            return;
+                        }
+                    }
+                }
+            }, "Hybrid-Console-SelectNewOrLoad");
+            consoleThread.setDaemon(true);
+            consoleThread.start();
+
+            Integer resolved = startChoice.await();
+            if (resolved != null && resolved == 1) {
+                // Load game (still offers both inputs via GUI selection of file list)
                 return loadGameGui(gameWindow);
             }
             return new Game();

@@ -6,6 +6,8 @@ import view.interfaces.IHumanView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -19,6 +21,8 @@ public class HumanViewGUI implements IHumanView {
     private Offer selectedOffer;
     private Boolean faceUpChoice;
 
+    private volatile JDialog activeDialog;
+
     public HumanViewGUI(JFrame mainFrame, JTextArea outputArea, JPanel cardPanel, JPanel handPanel, JPanel offersPanel) {
         this.mainFrame = mainFrame;
         this.outputArea = outputArea;
@@ -31,6 +35,23 @@ public class HumanViewGUI implements IHumanView {
         SwingUtilities.invokeLater(() -> {
             outputArea.append(text + "\n");
             outputArea.setCaretPosition(outputArea.getDocument().getLength());
+        });
+    }
+
+    public void cancelActiveDialog() {
+        JDialog dialog = activeDialog;
+        if (dialog == null) {
+            return;
+        }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                dialog.setVisible(false);
+                dialog.dispose();
+            } finally {
+                if (activeDialog == dialog) {
+                    activeDialog = null;
+                }
+            }
         });
     }
 
@@ -59,6 +80,16 @@ public class HumanViewGUI implements IHumanView {
         SwingUtilities.invokeLater(() -> {
             // Show dialog with visual cards
             JDialog dialog = new JDialog(mainFrame, "Choose Face-Up Card", true);
+            activeDialog = dialog;
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    if (activeDialog == dialog) {
+                        activeDialog = null;
+                    }
+                    latch.countDown();
+                }
+            });
             dialog.setLayout(new BorderLayout(10, 10));
             dialog.getContentPane().setBackground(new Color(0, 100, 0));
             
@@ -126,6 +157,16 @@ public class HumanViewGUI implements IHumanView {
         SwingUtilities.invokeLater(() -> {
             // Show dialog with visual offers
             JDialog dialog = new JDialog(mainFrame, "Choose an Offer", true);
+            activeDialog = dialog;
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    if (activeDialog == dialog) {
+                        activeDialog = null;
+                    }
+                    latch.countDown();
+                }
+            });
             dialog.setLayout(new BorderLayout(10, 10));
             dialog.getContentPane().setBackground(new Color(0, 100, 0));
             
@@ -174,6 +215,16 @@ public class HumanViewGUI implements IHumanView {
         SwingUtilities.invokeLater(() -> {
             // Show dialog with visual card selection
             JDialog dialog = new JDialog(mainFrame, "Choose Card", true);
+            activeDialog = dialog;
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    if (activeDialog == dialog) {
+                        activeDialog = null;
+                    }
+                    latch.countDown();
+                }
+            });
             dialog.setLayout(new BorderLayout(10, 10));
             dialog.getContentPane().setBackground(new Color(0, 100, 0));
             
