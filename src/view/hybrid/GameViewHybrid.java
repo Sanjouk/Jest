@@ -1,11 +1,13 @@
 package view.hybrid;
 
+import model.cards.ExtensionCard;
 import model.players.Player;
 import model.players.strategies.StrategyType;
 import view.console.GameView;
 import view.gui.GameViewGUI;
 import view.interfaces.IGameView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewHybrid implements IGameView {
@@ -21,7 +23,6 @@ public class GameViewHybrid implements IGameView {
     public int askNumberOfPlayers() {
         // Use console for input in hybrid mode (setup questions)
         int result = consoleView.askNumberOfPlayers();
-        // Output will be shown in both via showPlayers later
         return result;
     }
 
@@ -41,6 +42,19 @@ public class GameViewHybrid implements IGameView {
     public boolean isHumanPlayer(String name) {
         // Use console for input in hybrid mode
         return consoleView.isHumanPlayer(name);
+    }
+
+    @Override
+    public ArrayList<Integer> askForExtensions(ArrayList<ExtensionCard> availableExtensions) {
+        // In hybrid mode, use GUI for extension selection (more visual and user-friendly)
+        return guiView.askForExtensions(availableExtensions);
+    }
+
+    @Override
+    public void showInvalidExtensionMessage(String message) {
+        // Show error in both console and GUI
+        consoleView.showInvalidExtensionMessage(message);
+        guiView.showInvalidExtensionMessage(message);
     }
 
     @Override
@@ -85,4 +99,3 @@ public class GameViewHybrid implements IGameView {
         guiView.showEndRoundMessage();
     }
 }
-

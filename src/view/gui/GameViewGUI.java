@@ -1,11 +1,13 @@
 package view.gui;
 
+import model.cards.ExtensionCard;
 import model.players.Player;
 import model.players.strategies.StrategyType;
 import view.interfaces.IGameView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewGUI implements IGameView {
@@ -161,5 +163,60 @@ public class GameViewGUI implements IGameView {
         appendOutput("Game ended successfully.");
         appendOutput("We can assign all trophies to get the winner");
     }
+
+    @Override
+    public ArrayList<Integer> askForExtensions(ArrayList<ExtensionCard> availableExtensions) {
+        if (availableExtensions == null || availableExtensions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
+        for (ExtensionCard ext : availableExtensions) {
+            JCheckBox cb = new JCheckBox(ext.getName() + " [Val: " + ext.getFaceValue() + "] - " + ext.getDescription());
+            checkBoxes.add(cb);
+            panel.add(cb);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setPreferredSize(new Dimension(640, 220));
+
+        int result = JOptionPane.showConfirmDialog(
+                mainFrame,
+                scrollPane,
+                "Select Extra Cards",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        ArrayList<Integer> selected = new ArrayList<>();
+        if (result != JOptionPane.OK_OPTION) {
+            appendOutput("No extensions selected. Standard game.");
+            return selected;
+        }
+
+        for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                selected.add(i);
+            }
+        }
+
+        if (selected.isEmpty()) {
+            appendOutput("No extensions selected. Standard game.");
+        } else {
+            appendOutput("Extensions selected: " + selected);
+        }
+
+        return selected;
+    }
+
+    @Override
+    public void showInvalidExtensionMessage(String message){
+        JOptionPane.showMessageDialog(mainFrame, message, "Invalid Extension Configuration", JOptionPane.WARNING_MESSAGE);
+        appendOutput("Invalid extension configuration: " + message);
+    }
+
 }
 

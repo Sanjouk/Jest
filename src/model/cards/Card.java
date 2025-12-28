@@ -4,7 +4,7 @@ public abstract class Card {
     protected boolean isTrophy;
     protected TrophyType trophyType;
     protected Suit trophySuit;
-    protected Faces trophyFace;
+    protected Face trophyFace;
 
     public Card(boolean isTrophy) {
         this.isTrophy = isTrophy;
@@ -33,7 +33,7 @@ public abstract class Card {
         this.trophySuit = suit;
     }
 
-    public void setTrophyFace(Faces trophyFace){
+    public void setTrophyFace(Face trophyFace){
         this.trophyFace = trophyFace;
     }
 
@@ -41,7 +41,7 @@ public abstract class Card {
         return trophySuit;
     }
 
-    public Faces getTrophyFace(){
+    public Face getTrophyFace(){
         return trophyFace;
     }
 

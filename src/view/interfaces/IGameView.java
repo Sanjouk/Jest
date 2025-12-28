@@ -1,8 +1,10 @@
 package view.interfaces;
 
+import model.cards.ExtensionCard;
 import model.players.Player;
 import model.players.strategies.StrategyType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IGameView {
@@ -17,5 +19,8 @@ public interface IGameView {
     void showWinner(Player winner);
     void showWinners(List<Player> winners);
     void showEndRoundMessage();
+    ArrayList<Integer> askForExtensions(ArrayList<ExtensionCard> availableExtensions);
+    void showInvalidExtensionMessage(String message);
+
 }
 

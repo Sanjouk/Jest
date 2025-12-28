@@ -76,7 +76,7 @@ public class CardComponent extends JPanel {
 
     private void drawSuitCard(Graphics2D g, SuitCard suitCard) {
         Suit suit = suitCard.getSuit();
-        String face = suitCard.getFaces().toString();
+        String face = suitCard.getFace().toString();
         Color suitColor = (suit == Suit.HEARTS || suit == Suit.DIAMONDS) ? Color.RED : Color.BLACK;
         
         g.setColor(suitColor);
