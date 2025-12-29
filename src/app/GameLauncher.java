@@ -49,7 +49,7 @@ public class GameLauncher {
                 gameWindow = new GameWindow();
                 gameWindow.show();
                 gameView = new GameViewGUI(gameWindow.getFrame(), gameWindow.getOutputArea(), gameWindow.getCardPanel());
-                roundView = new RoundViewGUI(gameWindow.getOutputArea());
+                roundView = new RoundViewGUI(gameWindow.getOutputArea(), gameWindow.getOffersPanel(), gameWindow.getHandPanel());
                 viewFactory = new ViewFactory(ViewFactory.ViewMode.GUI, 
                                              gameWindow.getFrame(), 
                                              gameWindow.getOutputArea(), 
@@ -64,7 +64,7 @@ public class GameLauncher {
                 GameViewGUI guiGameView = new GameViewGUI(gameWindow.getFrame(), gameWindow.getOutputArea(), gameWindow.getCardPanel());
                 gameView = new GameViewHybrid(consoleGameView, guiGameView);
                 RoundView consoleRoundView = new RoundView();
-                RoundViewGUI guiRoundView = new RoundViewGUI(gameWindow.getOutputArea());
+                RoundViewGUI guiRoundView = new RoundViewGUI(gameWindow.getOutputArea(), gameWindow.getOffersPanel(), gameWindow.getHandPanel());
                 roundView = new RoundViewHybrid(consoleRoundView, guiRoundView);
                 viewFactory = new ViewFactory(ViewFactory.ViewMode.HYBRID, 
                                              gameWindow.getFrame(), 

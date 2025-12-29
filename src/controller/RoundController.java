@@ -5,6 +5,8 @@ import view.ViewFactory;
 import model.players.Offer;
 import model.players.Player;
 import model.game.Round;
+import view.gui.RoundViewGUI;
+import view.hybrid.RoundViewHybrid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,8 +87,34 @@ public class RoundController {
         model.setAlreadyPlayed(new ArrayList<>());
         while (turns < maxTurns) {
             view.showTurn(currentPlayer);
+
+            ArrayList<Offer> availableOffers = model.getAvailableOffers();
+            if (view instanceof RoundViewGUI gui) {
+                gui.showChoosingContext(currentPlayer, availableOffers);
+            } else if (view instanceof RoundViewHybrid hybrid) {
+                hybrid.showChoosingContext(currentPlayer, availableOffers);
+            }
+
             PlayerController controller = getController(currentPlayer);
-            Offer takenOffer = controller.chooseCard(model.getAvailableOffers());
+            Offer takenOffer = controller.chooseCard(availableOffers);
+
+            if (takenOffer != null) {
+                boolean isBotTurn = currentPlayer.isVirtual();
+                if (view instanceof RoundViewGUI gui) {
+                    if (isBotTurn) {
+                        gui.flashChosenOffer(takenOffer);
+                    } else {
+                        gui.highlightChosenOffer(takenOffer);
+                    }
+                } else if (view instanceof RoundViewHybrid hybrid) {
+                    if (isBotTurn) {
+                        hybrid.flashChosenOffer(takenOffer);
+                    } else {
+                        hybrid.highlightChosenOffer(takenOffer);
+                    }
+                }
+            }
+
             model.getAlreadyPlayed().add(currentPlayer);
             if (model.getAlreadyPlayed().size() <= maxTurns - 1) {
                 Player nextPlayer = model.getNextPlayer(model.getAlreadyPlayed(), takenOffer);

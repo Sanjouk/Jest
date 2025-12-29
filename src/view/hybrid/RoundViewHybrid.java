@@ -7,6 +7,8 @@ import view.console.RoundView;
 import view.gui.RoundViewGUI;
 import view.interfaces.IRoundView;
 
+import java.util.ArrayList;
+
 public class RoundViewHybrid implements IRoundView {
     private final RoundView consoleView;
     private final RoundViewGUI guiView;
@@ -86,6 +88,18 @@ public class RoundViewHybrid implements IRoundView {
     public void showNoOffers() {
         consoleView.showNoOffers();
         guiView.showNoOffers();
+    }
+
+    public void showChoosingContext(Player choosingPlayer, ArrayList<Offer> availableOffers) {
+        guiView.showChoosingContext(choosingPlayer, availableOffers);
+    }
+
+    public void highlightChosenOffer(Offer chosenOffer) {
+        guiView.highlightChosenOffer(chosenOffer);
+    }
+
+    public void flashChosenOffer(Offer chosenOffer) {
+        guiView.flashChosenOffer(chosenOffer);
     }
 }
 

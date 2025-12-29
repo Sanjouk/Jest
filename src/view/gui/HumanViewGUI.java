@@ -138,19 +138,6 @@ public class HumanViewGUI implements IHumanView {
                          " - Face up: " + offer.getFaceUpCard() + ", Face down: [hidden]");
         }
 
-        // Display offers visually
-        SwingUtilities.invokeLater(() -> {
-            offersPanel.removeAll();
-            for (Offer offer : selectableOffers) {
-                OfferComponent offerComp = new OfferComponent(offer, true, selectedOffer -> {
-                    HumanViewGUI.this.selectedOffer = selectedOffer;
-                });
-                offersPanel.add(offerComp);
-            }
-            offersPanel.revalidate();
-            offersPanel.repaint();
-        });
-
         selectedOffer = null;
         final CountDownLatch latch = new CountDownLatch(1);
 
@@ -182,6 +169,24 @@ public class HumanViewGUI implements IHumanView {
             for (Offer offer : selectableOffers) {
                 OfferComponent offerComp = new OfferComponent(offer, true, selectedOffer -> {
                     HumanViewGUI.this.selectedOffer = selectedOffer;
+
+                    // Highlight the selected offer in the main window offers panel (if present)
+                    SwingUtilities.invokeLater(() -> {
+                        for (Component comp : HumanViewGUI.this.offersPanel.getComponents()) {
+                            if (comp instanceof OfferComponent oc) {
+                                oc.setSelected(oc.getOffer() == selectedOffer);
+                            } else if (comp instanceof Container container) {
+                                for (Component child : container.getComponents()) {
+                                    if (child instanceof OfferComponent oc) {
+                                        oc.setSelected(oc.getOffer() == selectedOffer);
+                                    }
+                                }
+                            }
+                        }
+                        HumanViewGUI.this.offersPanel.revalidate();
+                        HumanViewGUI.this.offersPanel.repaint();
+                    });
+
                     dialog.dispose();
                     latch.countDown();
                 });

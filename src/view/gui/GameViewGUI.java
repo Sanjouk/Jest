@@ -3,6 +3,7 @@ package view.gui;
 import model.cards.ExtensionCard;
 import model.players.Player;
 import model.players.strategies.StrategyType;
+import app.GameLauncher;
 import view.interfaces.IGameView;
 
 import javax.swing.*;
@@ -18,6 +19,8 @@ public class GameViewGUI implements IGameView {
     private final JPanel cardPanel;
     private String inputResult;
     private boolean waitingForInput;
+
+    private final ArrayList<String> finalScoreLines = new ArrayList<>();
 
     private volatile JDialog activeDialog;
 
@@ -187,6 +190,7 @@ public class GameViewGUI implements IGameView {
 
     @Override
     public void showRound(int roundNumber) {
+        finalScoreLines.clear();
         appendOutput("\n=========================");
         appendOutput("      ROUND " + roundNumber);
         appendOutput("=========================");
@@ -200,7 +204,9 @@ public class GameViewGUI implements IGameView {
 
     @Override
     public void showScore(Player player) {
-        appendOutput(player.getName() + " has " + player.getScore() + " points.");
+        String line = player.getName() + " has " + player.getScore() + " points.";
+        finalScoreLines.add(line);
+        appendOutput(line);
     }
 
     @Override
@@ -228,6 +234,57 @@ public class GameViewGUI implements IGameView {
             }
             appendOutput(sb.toString());
         }
+
+        // End-of-game dialog (GUI only)
+        SwingUtilities.invokeLater(() -> {
+            StringBuilder message = new StringBuilder();
+            if (winners == null || winners.isEmpty()) {
+                message.append("No winner.\n\n");
+            } else if (winners.size() == 1) {
+                message.append("Winner: ").append(winners.getFirst().getName()).append("\n\n");
+            } else {
+                message.append("Winners: ");
+                for (int i = 0; i < winners.size(); i++) {
+                    message.append(winners.get(i).getName());
+                    if (i < winners.size() - 1) {
+                        message.append(", ");
+                    }
+                }
+                message.append("\n\n");
+            }
+
+            if (!finalScoreLines.isEmpty()) {
+                message.append("Final scores:\n");
+                for (String line : finalScoreLines) {
+                    message.append("- ").append(line).append("\n");
+                }
+                message.append("\n");
+            }
+
+            String[] options = {"New Game", "Exit"};
+            int choice = JOptionPane.showOptionDialog(
+                    mainFrame,
+                    message.toString(),
+                    "Game Over",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            if (choice == 0) {
+                try {
+                    mainFrame.dispose();
+                } finally {
+                    Thread t = new Thread(() -> GameLauncher.main(new String[0]), "Restart-GameLauncher");
+                    t.setDaemon(false);
+                    t.start();
+                }
+            } else {
+                System.exit(0);
+            }
+        });
     }
 
     @Override
