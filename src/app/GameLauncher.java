@@ -332,18 +332,19 @@ public class GameLauncher {
             };
         } else {
             // Console available, ask via console
-            java.util.Scanner scanner = new java.util.Scanner(System.in);
+            Scanner scanner = new Scanner(System.in);
             System.out.println("Select game mode:");
             System.out.println("1. Console");
             System.out.println("2. GUI");
             System.out.println("3. Hybrid (Console + GUI)");
             System.out.print("Enter choice (1-3): ");
-            
-            int choice = scanner.nextInt();
-            return switch (choice) {
-                case 1 -> GameMode.CONSOLE;
-                case 2 -> GameMode.GUI;
-                case 3 -> GameMode.HYBRID;
+
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            return switch (input) {
+                case "1", "console" -> GameMode.CONSOLE;
+                case "2", "gui" -> GameMode.GUI;
+                case "3", "hybrid" -> GameMode.HYBRID;
                 default -> {
                     System.out.println("Invalid choice, defaulting to Console mode");
                     yield GameMode.CONSOLE;

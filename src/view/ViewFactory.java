@@ -53,7 +53,7 @@ public class ViewFactory {
                 case CONSOLE:
                     return new VirtualView();
                 case GUI:
-                    return new VirtualView(); // Virtual players can use console view in GUI mode
+                    return new VirtualView();
                 case HYBRID:
                     return new VirtualView();
                 default:
